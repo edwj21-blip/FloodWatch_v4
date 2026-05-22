@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% block title %}My Reports — FloodWatch Kerala{% endblock %}
+{% block content %}
+<div style="background:linear-gradient(135deg,#030d1a,#051525); border-bottom:1px solid var(--border); padding:40px 0;">
+    <div class="container">
+        <a href="/" style="color:var(--text-muted); text-decoration:none; font-size:14px;">← Dashboard</a>
+        <h1 style="font-family:'Syne',sans-serif; font-size:32px; font-weight:800; margin-top:12px;">📋 Track My Reports</h1>
+        <p style="color:var(--text-muted); margin-top:8px;">Enter your phone number to view your submitted flood reports</p>
+    </div>
+</div>
+<div class="container page-body" style="max-width:800px;">
+    <div class="card" style="margin-bottom:24px;">
+        <form method="get" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+                <label class="form-label">Your Phone Number</label>
+                <input type="text" name="phone" value="{{ phone }}" placeholder="+91 XXXXX XXXXX" class="form-input">
+            </div>
+            <button type="submit" class="btn btn-primary">🔍 Find Reports</button>
+        </form>
+    </div>
+
+    {% if phone %}
+        {% if reports %}
+        <div style="margin-bottom:16px; font-size:14px; color:var(--text-muted);">
+            Found <strong style="color:white;">{{ reports.count }}</strong> report{{ reports.count|pluralize }} for {{ phone }}
+        </div>
+        {% for report in reports %}
+        <div class="card" style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+                <div>
+                    <div style="font-weight:700; font-size:16px; margin-bottom:4px;">📍 {{ report.location }}, {{ report.district }}</div>
+                    <div style="font-size:12px; color:var(--text-muted);">Submitted {{ report.reported_at|date:"d M Y, g:i A" }} • Report #{{ report.id }}</div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <span class="badge badge-{{ report.severity|lower }}">{{ report.severity }}</span>
+                    <span class="badge badge-{{ report.status|lower }}">{{ report.status }}</span>
+                </div>
+            </div>
+            <p style="font-size:14px; color:var(--text-dim); line-height:1.6; margin-bottom:12px;">{{ report.description }}</p>
+            {% if report.photo %}
+            <img src="{{ report.photo.url }}" style="max-width:100%; max-height:200px; border-radius:10px; object-fit:cover;" alt="Report photo">
+            {% endif %}
+            {% if report.rescue_team_assigned %}
+            <div style="margin-top:14px; padding:12px; background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.3); border-radius:10px; font-size:13px;">
+                🚁 <strong>Rescue team assigned:</strong> {{ report.rescue_team_assigned.name }} — 
+                <a href="tel:{{ report.rescue_team_assigned.contact_number }}" style="color:var(--primary);">{{ report.rescue_team_assigned.contact_number }}</a>
+            </div>
+            {% endif %}
+            {% if report.admin_notes %}
+            <div style="margin-top:10px; padding:12px; background:var(--bg2); border-radius:10px; font-size:13px; color:var(--text-dim);">
+                📝 Admin note: {{ report.admin_notes }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="card" style="text-align:center; padding:50px;">
+            <div style="font-size:48px; margin-bottom:16px;">📋</div>
+            <h3>No reports found</h3>
+            <p style="color:var(--text-muted); margin:8px 0 20px;">No flood reports found for this phone number.</p>
+            <a href="/report/" class="btn btn-danger">⚠️ Submit a Report</a>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
