@@ -13,7 +13,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     'localhost',
-    'https://floodwatch-v4.onrender.com',
+    'http://127.0.0.1:8000',
     '.railway.app',
     '.vercel.app',
     '*',

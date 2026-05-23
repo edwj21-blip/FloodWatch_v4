@@ -22,7 +22,7 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Open: https://floodwatch-v4.onrender.com
+Open: http://127.0.0.1:8000
 ---
 
 ## OpenWeatherMap API (FREE)
