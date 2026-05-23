@@ -1,13 +1,23 @@
 from pathlib import Path
 import os
+import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-floodwatch-secret-key-change-in-production'
+# Security
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-floodwatch-secret-key-change-in-production')
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.railway.app',
+    '.vercel.app',
+    '*',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -16,11 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'core',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -28,6 +41,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "https://flood-watch-v4.vercel.app",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'floodwatch.urls'
 
@@ -49,11 +68,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'floodwatch.wsgi.application'
 
+# Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -63,9 +82,12 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
+# Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -75,6 +97,5 @@ LOGIN_URL = '/portal/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/portal/'
 
-# ─── OpenWeatherMap API ───────────────────────────────────────────────────────
-# Sign up free at https://openweathermap.org/api and paste your key here
-OPENWEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY_HERE'
+# OpenWeatherMap API
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY', 'YOUR_OPENWEATHER_API_KEY_HERE')
